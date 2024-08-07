@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 pygame.init()
 
 class DrawInformation:
@@ -17,7 +18,7 @@ class DrawInformation:
     ]
     
     FONT = pygame.font.SysFont("comicsans", 20)
-    LARGE_FONT = pygame.font.SysFont("comicsans", 40)
+    LARGE_FONT = pygame.font.SysFont("comicsans", 30)
     SIDE_PAD = 100
     TOP_PAD = 150
     
@@ -35,17 +36,20 @@ class DrawInformation:
         self.min_val = min(lst)
         
         self.block_width = round((self.width - self.SIDE_PAD) / len(lst))
-        self.block_height = round((self.height - self.TOP_PAD) / (self.max_val - self.min_val))
+        self.block_height = math.floor((self.height - self.TOP_PAD) / (self.max_val - self.min_val))
         self.start_x = self.SIDE_PAD // 2
         
-def draw(draw_info):
+def draw(draw_info, algo_name, ascending):
     draw_info.window.fill(draw_info.BACKGROUND_COLOR)
     
+    title = draw_info.LARGE_FONT.render(f"{algo_name} - {'Ascending' if ascending else 'Descending'}", 1, draw_info.BLACK)
+    draw_info.window.blit(title, (draw_info.width / 2 - title.get_width() / 2, 5))
+    
     controls_info = draw_info.FONT.render("R - Reset | SPACE - Start Sorting | A - Ascending | D - Descending", 1, draw_info.BLACK)
-    draw_info.window.blit(controls_info, (draw_info.width / 2 - controls_info.get_width() / 2, 5))
+    draw_info.window.blit(controls_info, (draw_info.width / 2 - controls_info.get_width() / 2, 45))
     
     sorting_info = draw_info.FONT.render("I | Insertion Sort | B - Bubble Sort", 1, draw_info.BLACK)
-    draw_info.window.blit(sorting_info, (draw_info.width / 2 - sorting_info.get_width() / 2, 35))
+    draw_info.window.blit(sorting_info, (draw_info.width / 2 - sorting_info.get_width() / 2, 75))
     
     draw_list(draw_info)
     pygame.display.update()
@@ -69,7 +73,7 @@ def draw_list(draw_info, color_positions={}, clear_bg=False):
         pygame.draw.rect(draw_info.window, color, (x, y, draw_info.block_width, draw_info.height))
         
         if clear_bg:
-            pygame.display.update()#sus
+            pygame.display.update()
         
 def generate_starting_list(n, min_val, max_val):
     lst = []
@@ -94,6 +98,26 @@ def bubble_sort(draw_info, ascending=True):
                 yield True
     return lst
 
+def insertion_sort(draw_info, ascending=True):
+    lst = draw_info.lst
+    
+    for i in range(1, len(lst)):
+        current = lst[i]
+        
+        while True:
+            ascending_sort = i > 0 and lst[i - 1] > current and ascending
+            descending_sort = i < 0 and lst[i - 1] < current and not ascending
+            
+            if not ascending_sort and not descending_sort:
+                break
+            
+            lst[i] = lst[i - 1]
+            i = i -1
+            lst[i] = current
+            draw_list(draw_info, {i - 1: draw_info.GREEN, i: draw_info.RED}, True)
+            yield True
+    return list
+
 def main():
     run = True
     clock = pygame.time.Clock()
@@ -113,7 +137,7 @@ def main():
     sorting_algorithm_generator = None
     
     while run:
-        clock.tick(60)
+        #clock.tick(60)
         
         if sorting:
             try:
@@ -121,7 +145,7 @@ def main():
             except StopIteration:
                 sorting = False
         else:
-            draw(draw_info)
+            draw(draw_info, sorting_algo_name, ascending)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -136,10 +160,8 @@ def main():
                 sorting = True
                 sorting_algorithm_generator = sorting_algorithm(draw_info, ascending)
             elif event.key == pygame.K_a and not sorting:
-                sorting = True
                 ascending = True
             elif event.key == pygame.K_d and not sorting:
-                sorting = True
                 ascending = False
                 
     pygame.quit()
