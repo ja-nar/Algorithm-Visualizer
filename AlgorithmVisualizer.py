@@ -5,7 +5,7 @@ pygame.init()
 class DrawInformation:
     BLACK = 0, 0, 0
     WHITE = 255, 255, 255
-    GREEN = 0, 255, 255
+    GREEN = 0, 255, 0
     RED = 255, 0, 0
     128, 128, 128
     BACKGROUND_COLOR = WHITE
@@ -16,6 +16,8 @@ class DrawInformation:
         (192, 192, 192)
     ]
     
+    FONT = pygame.font.SysFont("comicsans", 20)
+    LARGE_FONT = pygame.font.SysFont("comicsans", 40)
     SIDE_PAD = 100
     TOP_PAD = 150
     
@@ -38,6 +40,13 @@ class DrawInformation:
         
 def draw(draw_info):
     draw_info.window.fill(draw_info.BACKGROUND_COLOR)
+    
+    controls_info = draw_info.FONT.render("R - Reset | SPACE - Start Sorting | A - Ascending | D - Descending", 1, draw_info.BLACK)
+    draw_info.window.blit(controls_info, (draw_info.width / 2 - controls_info.get_width() / 2, 5))
+    
+    sorting_info = draw_info.FONT.render("I | Insertion Sort | B - Bubble Sort", 1, draw_info.BLACK)
+    draw_info.window.blit(sorting_info, (draw_info.width / 2 - sorting_info.get_width() / 2, 35))
+    
     draw_list(draw_info)
     pygame.display.update()
     
