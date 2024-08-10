@@ -8,7 +8,6 @@ class DrawInformation:
     WHITE = 255, 255, 255
     GREEN = 0, 255, 0
     RED = 255, 0, 0
-    128, 128, 128
     BACKGROUND_COLOR = WHITE
     
     GRADIENTS = [
@@ -26,7 +25,7 @@ class DrawInformation:
         self.width = width
         self.height = height
         
-        self.window = pygame.display.set_mode(size=(width, height))
+        self.window = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Sorting algorithm visualizer")
         self.set_list(lst)
         
@@ -106,7 +105,7 @@ def insertion_sort(draw_info, ascending=True):
         
         while True:
             ascending_sort = i > 0 and lst[i - 1] > current and ascending
-            descending_sort = i < 0 and lst[i - 1] < current and not ascending
+            descending_sort = i > 0 and lst[i - 1] < current and not ascending
             
             if not ascending_sort and not descending_sort:
                 break
@@ -116,7 +115,8 @@ def insertion_sort(draw_info, ascending=True):
             lst[i] = current
             draw_list(draw_info, {i - 1: draw_info.GREEN, i: draw_info.RED}, True)
             yield True
-    return list
+            
+    return lst
 
 def main():
     run = True
@@ -130,14 +130,14 @@ def main():
     draw_info = DrawInformation(800, 600, lst)
     
     sorting = False
-    ascending = False
+    ascending = True
     
     sorting_algorithm = bubble_sort
     sorting_algo_name = "Bubble sort"
     sorting_algorithm_generator = None
     
     while run:
-        #clock.tick(60)
+        clock.tick(60)
         
         if sorting:
             try:
@@ -163,6 +163,12 @@ def main():
                 ascending = True
             elif event.key == pygame.K_d and not sorting:
                 ascending = False
+            elif event.key == pygame.K_i and not sorting:
+                sorting_algorithm = insertion_sort
+                sorting_algo_name = "Insertion sort"
+            elif event.key == pygame.K_b and not sorting:
+                sorting_algorithm = bubble_sort
+                sorting_algo_name = "Bubble sort"
                 
     pygame.quit()
     
